@@ -3,6 +3,8 @@ package com.photography.shutterup.controller;
 import com.photography.shutterup.dto.PostRequestDTO;
 import com.photography.shutterup.dto.PostResponseDTO;
 import com.photography.shutterup.model.Post;
+import com.photography.shutterup.model.User;
+import com.photography.shutterup.repository.UserRepository;
 import com.photography.shutterup.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,23 @@ import java.util.stream.Collectors;
 public class PostController {
 
     private final PostService postService;
+    private final UserRepository userRepository;
 
     @PostMapping
     public PostResponseDTO createPost(@RequestBody PostRequestDTO request) {
-        Post post = mapToPost(request);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+
+        Post post = Post.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .mediaUrl(request.getMediaUrl())
+                .mediaType(request.getMediaType())
+                .cameraSettings(request.getCameraSettings())
+                .location(request.getLocation())
+                .user(user) // 🔥 Set User Entity, not just ID
+                .build();
+
         Post createdPost = postService.createPost(post);
         return mapToResponseDTO(createdPost);
     }
@@ -38,26 +53,25 @@ public class PostController {
 
     @PutMapping("/{id}")
     public PostResponseDTO updatePost(@PathVariable Long id, @RequestBody PostRequestDTO request) {
-        Post post = mapToPost(request);
-        Post updatedPost = postService.updatePost(id, post);
-        return mapToResponseDTO(updatedPost);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+
+        Post updatedPost = Post.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .mediaUrl(request.getMediaUrl())
+                .mediaType(request.getMediaType())
+                .cameraSettings(request.getCameraSettings())
+                .location(request.getLocation())
+                .user(user)
+                .build();
+
+        return mapToResponseDTO(postService.updatePost(id, updatedPost));
     }
 
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-    }
-
-    private Post mapToPost(PostRequestDTO dto) {
-        return Post.builder()
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .mediaUrl(dto.getMediaUrl())
-                .mediaType(dto.getMediaType())
-                .cameraSettings(dto.getCameraSettings())
-                .location(dto.getLocation())
-                .createdBy(dto.getCreatedBy())
-                .build();
     }
 
     private PostResponseDTO mapToResponseDTO(Post post) {
@@ -69,7 +83,7 @@ public class PostController {
                 .mediaType(post.getMediaType())
                 .cameraSettings(post.getCameraSettings())
                 .location(post.getLocation())
-                .createdBy(post.getCreatedBy())
+                .userId(post.getUser().getId()) // 🔥 Get userId from User entity
                 .createdAt(post.getCreatedAt())
                 .build();
     }
