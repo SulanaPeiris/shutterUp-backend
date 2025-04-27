@@ -2,7 +2,9 @@ package com.photography.shutterup.service.impl;
 
 import com.photography.shutterup.exception.ResourceNotFoundException;
 import com.photography.shutterup.model.Post;
+import com.photography.shutterup.model.User;
 import com.photography.shutterup.repository.PostRepository;
+import com.photography.shutterup.repository.UserRepository;
 import com.photography.shutterup.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Post createPost(Post post) {
@@ -33,22 +36,23 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post updatePost(Long id, Post updatedPost) {
-        Post existingPost = getPostById(id);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
 
-        existingPost.setTitle(updatedPost.getTitle());
-        existingPost.setDescription(updatedPost.getDescription());
-        existingPost.setMediaUrl(updatedPost.getMediaUrl());
-        existingPost.setMediaType(updatedPost.getMediaType());
-        existingPost.setCameraSettings(updatedPost.getCameraSettings());
-        existingPost.setLocation(updatedPost.getLocation());
-        existingPost.setCreatedBy(updatedPost.getCreatedBy());
+        post.setTitle(updatedPost.getTitle());
+        post.setDescription(updatedPost.getDescription());
+        post.setMediaUrl(updatedPost.getMediaUrl());
+        post.setMediaType(updatedPost.getMediaType());
+        post.setCameraSettings(updatedPost.getCameraSettings());
+        post.setLocation(updatedPost.getLocation());
 
-        return postRepository.save(existingPost);
+        return postRepository.save(post);
     }
 
     @Override
     public void deletePost(Long id) {
-        Post post = getPostById(id);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
         postRepository.delete(post);
     }
 }
