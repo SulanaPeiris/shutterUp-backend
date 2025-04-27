@@ -13,7 +13,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**", "/api/posts/**").permitAll() // allow user APIs without login
+                        .requestMatchers("/api/users/**", "/api/posts/**", "/api/comments/**").permitAll() // allow user APIs without login
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable());

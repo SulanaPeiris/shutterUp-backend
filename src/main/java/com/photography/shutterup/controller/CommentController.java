@@ -3,6 +3,10 @@ package com.photography.shutterup.controller;
 import com.photography.shutterup.dto.CommentRequestDTO;
 import com.photography.shutterup.dto.CommentResponseDTO;
 import com.photography.shutterup.model.Comment;
+import com.photography.shutterup.model.Post;
+import com.photography.shutterup.model.User;
+import com.photography.shutterup.repository.PostRepository;
+import com.photography.shutterup.repository.UserRepository;
 import com.photography.shutterup.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +20,27 @@ import java.util.stream.Collectors;
 public class CommentController {
 
     private final CommentService commentService;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @PostMapping
     public CommentResponseDTO createComment(@RequestBody CommentRequestDTO request) {
-        Comment comment = mapToComment(request);
-        Comment createdComment = commentService.createComment(comment);
-        return mapToResponseDTO(createdComment);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(() -> new RuntimeException("Post not found!"));
+
+        Comment comment = Comment.builder()
+                .user(user)
+                .post(post)
+                .content(request.getContent())
+                .build();
+
+        return mapToResponseDTO(commentService.createComment(comment));
     }
 
     @GetMapping("/post/{postId}")
-    public List<CommentResponseDTO> getCommentsByPostId(@PathVariable Long postId) {
+    public List<CommentResponseDTO> getCommentsByPost(@PathVariable Long postId) {
         return commentService.getCommentsByPostId(postId).stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
@@ -42,19 +57,11 @@ public class CommentController {
         commentService.deleteComment(id, userId);
     }
 
-    private Comment mapToComment(CommentRequestDTO dto) {
-        return Comment.builder()
-                .postId(dto.getPostId())
-                .userId(dto.getUserId())
-                .content(dto.getContent())
-                .build();
-    }
-
     private CommentResponseDTO mapToResponseDTO(Comment comment) {
         return CommentResponseDTO.builder()
                 .id(comment.getId())
-                .postId(comment.getPostId())
-                .userId(comment.getUserId())
+                .postId(comment.getPost().getId())
+                .userId(comment.getUser().getId())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
