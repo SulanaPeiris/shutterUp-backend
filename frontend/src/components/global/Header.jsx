@@ -13,9 +13,9 @@ const Header = () => {
       case "/community":
         return "Community";
       case "/profile":
-        return "Profile";
+        return "page";
       case "/featured":
-        return "Featured";
+        return "Featred";
       case "/following":
         return "Following";
       case "/learn":
