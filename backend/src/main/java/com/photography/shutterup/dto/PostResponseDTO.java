@@ -17,4 +17,8 @@ public class PostResponseDTO {
     private String location;
     private Long userId;          // 🔥 Show userId
     private LocalDateTime createdAt;
+    private String username;
+    private long likeCount;
+    private long commentCount;
+
 }

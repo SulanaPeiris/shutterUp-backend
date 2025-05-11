@@ -2,6 +2,7 @@ package com.photography.shutterup.service;
 
 import com.photography.shutterup.model.User;
 import com.photography.shutterup.repository.UserRepository;
+import com.photography.shutterup.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,10 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .authorities("ROLE_" + user.getRole())
-                .build();
+        return new CustomUserDetails(user);
     }
 }

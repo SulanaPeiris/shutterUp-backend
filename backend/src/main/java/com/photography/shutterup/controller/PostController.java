@@ -4,6 +4,8 @@ import com.photography.shutterup.dto.PostRequestDTO;
 import com.photography.shutterup.dto.PostResponseDTO;
 import com.photography.shutterup.model.Post;
 import com.photography.shutterup.model.User;
+import com.photography.shutterup.repository.CommentRepository;
+import com.photography.shutterup.repository.LikeRepository;
 import com.photography.shutterup.repository.UserRepository;
 import com.photography.shutterup.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ public class PostController {
 
     private final PostService postService;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     @PostMapping
     public PostResponseDTO createPost(@RequestBody PostRequestDTO request) {
@@ -32,11 +36,18 @@ public class PostController {
                 .mediaType(request.getMediaType())
                 .cameraSettings(request.getCameraSettings())
                 .location(request.getLocation())
-                .user(user) // 🔥 Set User Entity, not just ID
+                .user(user)
                 .build();
 
         Post createdPost = postService.createPost(post);
         return mapToResponseDTO(createdPost);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<PostResponseDTO> getPostsByUserId(@PathVariable Long userId) {
+        return postService.getPostsByUserId(userId).stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping
@@ -75,6 +86,9 @@ public class PostController {
     }
 
     private PostResponseDTO mapToResponseDTO(Post post) {
+        long likeCount = likeRepository.countByPostId(post.getId());
+        long commentCount = commentRepository.countByPostId(post.getId());
+
         return PostResponseDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -83,8 +97,11 @@ public class PostController {
                 .mediaType(post.getMediaType())
                 .cameraSettings(post.getCameraSettings())
                 .location(post.getLocation())
-                .userId(post.getUser().getId()) // 🔥 Get userId from User entity
+                .userId(post.getUser().getId())
+                .username(post.getUser().getUsername())
                 .createdAt(post.getCreatedAt())
+                .likeCount(likeCount)
+                .commentCount(commentCount)
                 .build();
     }
 }

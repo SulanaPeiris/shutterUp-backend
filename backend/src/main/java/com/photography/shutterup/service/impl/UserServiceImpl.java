@@ -36,8 +36,11 @@ public class UserServiceImpl implements UserService {
         User existingUser = getUserById(id);
 
         existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPassword(updatedUser.getPassword());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
         existingUser.setName(updatedUser.getName());
+        existingUser.setUsername(updatedUser.getUsername());
         existingUser.setBio(updatedUser.getBio());
         existingUser.setRole(updatedUser.getRole());
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
@@ -45,6 +48,7 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.save(existingUser);
     }
+
 
     @Override
     public void deleteUser(Long id) {

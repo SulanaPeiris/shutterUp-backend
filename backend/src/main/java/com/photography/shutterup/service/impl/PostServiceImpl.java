@@ -35,6 +35,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> getPostsByUserId(Long userId) {
+        return postRepository.findByUserId(userId);
+    }
+
+
+    @Override
     public Post updatePost(Long id, Post updatedPost) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));

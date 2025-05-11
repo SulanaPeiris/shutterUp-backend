@@ -51,6 +51,7 @@ public class UserController {
     private User mapToUser(UserRequestDTO dto) {
         return User.builder()
                 .email(dto.getEmail())
+                .username(dto.getUsername())
                 .password(dto.getPassword())
                 .name(dto.getName())
                 .bio(dto.getBio())
@@ -64,10 +65,13 @@ public class UserController {
         return UserResponseDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .username(user.getUsername())
                 .name(user.getName())
                 .bio(user.getBio())
+                .profilePicture(user.getProfilePicture())
                 .role(user.getRole())
                 .isBanned(user.getIsBanned())
+
                 .createdAt(user.getCreatedAt())
                 .build();
     }

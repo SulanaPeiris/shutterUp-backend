@@ -11,9 +11,12 @@ import java.time.LocalDateTime;
 public class UserResponseDTO {
     private Long id;
     private String email;
+    private String username;
     private String name;
     private String bio;
+    private String profilePicture;
     private Role role;
     private Boolean isBanned;
+    private int followersCount;
     private LocalDateTime createdAt;
 }

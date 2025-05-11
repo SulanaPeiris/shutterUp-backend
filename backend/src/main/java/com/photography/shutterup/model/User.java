@@ -2,7 +2,10 @@ package com.photography.shutterup.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -19,12 +22,12 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
     private String password;
-
     private String name;
-
-    private String bio;   // <-- ✅ New bio field added here!
-
+    private String bio;
     private String profilePicture;
 
     @Enumerated(EnumType.STRING)
@@ -39,9 +42,12 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+
     public enum Role {
         USER,
         VERIFIED_USER,
         ADMIN
     }
+
+
 }
