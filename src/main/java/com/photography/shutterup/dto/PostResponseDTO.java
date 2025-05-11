@@ -15,6 +15,6 @@ public class PostResponseDTO {
     private String mediaType;
     private String cameraSettings;
     private String location;
-    private Long createdBy;
+    private Long userId;          // 🔥 Show userId
     private LocalDateTime createdAt;
 }

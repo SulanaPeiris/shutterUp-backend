@@ -10,5 +10,5 @@ public class PostRequestDTO {
     private String mediaType;
     private String cameraSettings;
     private String location;
-    private Long createdBy;
+    private Long userId; // 🔥 Accept userId from client
 }

@@ -17,13 +17,16 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;            // Short title or caption
-    private String description;      // Full description, tips, settings
-    private String mediaUrl;          // Image or video URL
-    private String mediaType;         // "IMAGE" or "VIDEO"
-    private String cameraSettings;   // Example: "ISO 100, f/1.8, 1/250s"
-    private String location;         // Where photo/video was taken
-    private Long createdBy;           // User ID (for simplicity now)
+    private String title;             // Short title or caption
+    private String description;       // Full description, tips, settings
+    private String mediaUrl;           // Image or video URL
+    private String mediaType;          // "IMAGE" or "VIDEO"
+    private String cameraSettings;    // Example: "ISO 100, f/1.8, 1/250s"
+    private String location;          // Where photo/video was taken
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
+    private User user;                // 🔥 Linked User entity (creator)
 
     private LocalDateTime createdAt;
 
